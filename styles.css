@@ -24,17 +24,11 @@
      cursor: pointer;
      position: absolute;
      top: 0;
-     left: 1460px;
+     left: 1830px;
      margin: 10px;
      /* ボタンが画面の端にくっつかないようにするための余白 */
  }
 
- .centered img {
-     width: 90%;
-     height: 90%;
-     object-fit: cover;
-     /* 画像をボタンのサイズに合わせる */
- }
 
  html {
      background-color: #B9D1EA;
