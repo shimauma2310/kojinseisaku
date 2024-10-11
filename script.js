@@ -185,6 +185,10 @@ const bgm = document.getElementById('bgm');
         });
 document.getElementById('volumeControl').addEventListener('input', function(event) {
     var audio = document.getElementById('bgm');
-    audio.volume = event.target.value;
+    audio.volume = event.target.value / 100; // 音量を0から1の範囲に変換
+});
+document.getElementById('volumeControl').addEventListener('change', function(event) {
+    var audio = document.getElementById('bgm');
+    audio.volume = event.target.value / 100; // 音量を0から1の範囲に変換
 });
 
