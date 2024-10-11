@@ -52,7 +52,7 @@ function createInputFields(digits) {
         input.min = 0;
         input.max = 9;
         input.id = `input${i}`;
-         input.value = 0; // デフォルト値を0に設定
+        input.value = 0; // デフォルト値を0に設定
 
         // keydownイベントリスナーを追加
         input.addEventListener('keydown', (event) => {
