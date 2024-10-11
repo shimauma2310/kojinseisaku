@@ -52,6 +52,27 @@ function createInputFields(digits) {
         input.min = 0;
         input.max = 9;
         input.id = `input${i}`;
+
+        // keydownイベントリスナーを追加
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown') {
+                if (input.value === '0') {
+                    input.value = '9';
+                } else {
+                    input.value = (parseInt(input.value) - 1 + 10) % 10;
+                }
+                event.preventDefault(); // デフォルトの動作を防ぐ
+            } 
+            else if (event.key === 'ArrowUp') {
+                if (input.value === '9') {
+                    input.value = '0';
+                } else {
+                    input.value = (parseInt(input.value) + 1) % 10;
+                }
+                event.preventDefault(); // デフォルトの動作を防ぐ
+            }
+        });
+        
         document.getElementById('inputArea').appendChild(input);
     }
 }
