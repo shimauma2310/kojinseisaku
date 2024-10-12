@@ -2,8 +2,6 @@
 document.getElementById('startButton').addEventListener('click', startGame);
 
 function startGame() {
-    // 開始ボタンを非表示にする
-    document.getElementById('startButton').style.display = 'none';
 
     // ユーザーが入力した桁数と制限時間を取得
     const digits = parseInt(document.getElementById('digits').value);
@@ -18,6 +16,8 @@ function startGame() {
         alert('制限時間は1秒以上で入力してください。');
         return;
     }
+    // 開始ボタンを非表示にする
+    document.getElementById('startButton').style.display = 'none';
 
     // 秘密の数字を生成
     const secretNumber = generateSecretNumber(digits);
