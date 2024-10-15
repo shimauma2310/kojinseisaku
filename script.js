@@ -2,7 +2,7 @@
 document.getElementById('startButton').addEventListener('click', startGame);
 
 function startGame() {
-
+   
     // ユーザーが入力した桁数と制限時間を取得
     const digits = parseInt(document.getElementById('digits').value);
     const timeLimit = parseInt(document.getElementById('timeLimit').value);
@@ -16,15 +16,15 @@ function startGame() {
         alert('制限時間は1秒以上で入力してください。');
         return;
     }
-    // 開始ボタンを非表示にする
-    document.getElementById('startButton').style.display = 'none';
+     // 開始ボタンを非表示にする
+     document.getElementById('startButton').style.display = 'none';
+
 
     // 秘密の数字を生成
     const secretNumber = generateSecretNumber(digits);
     let startTime = Date.now();
     let timerInterval;
-    
- // 追加: secretNumberをHTMLに表示
+    // 追加: secretNumberをHTMLに表示
     document.getElementById('secretNumberDisplay').textContent = `Debug: Secret Number is ${secretNumber.join('')}`;
     document.getElementById('debugArea').style.display = 'block';
 
@@ -41,11 +41,12 @@ function startGame() {
     timerInterval = setInterval(() => {
         updateTimer(timeLimit, startTime, timerInterval, secretNumber);
     }, 1000);
+
+    // 送信ボタンがクリックされたときにcheckGuess関数を呼び出すイベントリスナーを追加
     document.getElementById('submitButton').addEventListener('click', () => {
-        checkGuess(digits, secretNumber, timerInterval, startTime); // startTimeを引数に追加
+        checkGuess(digits, secretNumber, timerInterval);
     });
 }
-
 
 function createInputFields(digits) {
     // 指定された桁数分の入力フィールドを生成
@@ -66,7 +67,7 @@ function createInputFields(digits) {
                     input.value = (parseInt(input.value) - 1 + 10) % 10;
                 }
                 event.preventDefault(); // デフォルトの動作を防ぐ
-            } 
+            }
             else if (event.key === 'ArrowUp') {
                 if (input.value === '9') {
                     input.value = '0';
@@ -75,8 +76,10 @@ function createInputFields(digits) {
                 }
                 event.preventDefault(); // デフォルトの動作を防ぐ
             }
+            
         });
-        
+
+
         document.getElementById('inputArea').appendChild(input);
     }
 }
@@ -153,6 +156,8 @@ function checkGuess(digits, secretNumber, timerInterval) {
     // 結果を表示
     if (hitCount === digits) {
         clearInterval(timerInterval);
+        const endTime = Date.now(); // ゲームクリア時にタイマーを停止
+        const clearTime = (endTime - startTime) / 1000; // クリアタイムを計算
         document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！クリアタイム: ${clearTime.toFixed(2)} 秒`; // クリアタイムを表示
         document.getElementById('submitButton').style.display = 'none'; // submitButtonを非表示にする
         document.getElementById('retryButton').style.display = 'block';
@@ -177,22 +182,18 @@ function generateSecretNumber(digits) {
     return numbers;
 }
 const bgm = document.getElementById('bgm');
-        const playButton = document.getElementById('play');
-        const pauseButton = document.getElementById('pause');
+const playButton = document.getElementById('play');
+const pauseButton = document.getElementById('pause');
 
-        playButton.addEventListener('click', () => {
-            bgm.play();
-        });
-
-        pauseButton.addEventListener('click', () => {
-            bgm.pause();
-        });
-document.getElementById('volumeControl').addEventListener('input', function(event) {
-    var audio = document.getElementById('bgm');
-    audio.volume = event.target.value / 100; // 音量を0から1の範囲に変換
+playButton.addEventListener('click', () => {
+    bgm.play();
 });
-document.getElementById('volumeControl').addEventListener('change', function(event) {
+
+pauseButton.addEventListener('click', () => {
+    bgm.pause();
+});
+document.getElementById('volumeControl').addEventListener('input', function (event) {
     var audio = document.getElementById('bgm');
-    audio.volume = event.target.value / 100; // 音量を0から1の範囲に変換
+    audio.volume = event.target.value / 100;
 });
 
