@@ -45,6 +45,14 @@ function startGame() {
     document.getElementById('submitButton').addEventListener('click', () => {
         checkGuess(digits, secretNumber, timerInterval);
     });
+
+    // スペースキーが押されたときにsubmitButtonをクリックするイベントリスナーを追加
+    document.addEventListener('keydown', function(event) {
+        if (event.code === 'Space') {
+            event.preventDefault(); // デフォルトのスペースキーの動作を防ぐ
+            document.getElementById('submitButton').click(); // submitButtonをクリック
+        }
+    });
 }
 
 function createInputFields(digits) {
