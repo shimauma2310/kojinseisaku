@@ -156,9 +156,7 @@ function checkGuess(digits, secretNumber, timerInterval) {
     // 結果を表示
     if (hitCount === digits) {
         clearInterval(timerInterval);
-        const endTime = Date.now(); // ゲームクリア時にタイマーを停止
-        const clearTime = (endTime - startTime) / 1000; // クリアタイムを計算
-        document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！クリアタイム: ${clearTime.toFixed(2)} 秒`; // クリアタイムを表示
+        document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！`;
         document.getElementById('submitButton').style.display = 'none'; // submitButtonを非表示にする
         document.getElementById('retryButton').style.display = 'block';
     } else if (hitCount >= 1) {
