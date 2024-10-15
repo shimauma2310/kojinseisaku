@@ -37,6 +37,10 @@ function startGame() {
     timerInterval = setInterval(() => {
         updateTimer(timeLimit, startTime, timerInterval, secretNumber);
     }, 1000);
+    document.getElementById('submitButton').addEventListener('click', () => {
+        checkGuess(digits, secretNumber, timerInterval, startTime); // startTimeを引数に追加
+    });
+}
 
     // 送信ボタンがクリックされたときにcheckGuess関数を呼び出すイベントリスナーを追加
     document.getElementById('submitButton').addEventListener('click', () => {
@@ -150,7 +154,9 @@ function checkGuess(digits, secretNumber, timerInterval) {
     // 結果を表示
     if (hitCount === digits) {
         clearInterval(timerInterval);
-        document.getElementById('result').textContent = 'すべての数字が合致しました！ゲームクリア！';
+        const endTime = Date.now(); // ゲームクリア時にタイマーを停止
+        const clearTime = (endTime - startTime) / 1000; // クリアタイムを計算
+        document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！クリアタイム: ${clearTime.toFixed(2)} 秒`; // クリアタイムを表示
         document.getElementById('submitButton').style.display = 'none'; // submitButtonを非表示にする
         document.getElementById('retryButton').style.display = 'block';
     } else if (hitCount >= 1) {
