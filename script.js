@@ -1,6 +1,7 @@
 // スタートボタンがクリックされたときにstartGame関数を呼び出すイベントリスナーを追加
 document.getElementById('startButton').addEventListener('click', startGame);
 
+let startTime;
 function startGame() {
    
     // ユーザーが入力した桁数と制限時間を取得
@@ -22,11 +23,9 @@ function startGame() {
 
     // 秘密の数字を生成
     const secretNumber = generateSecretNumber(digits);
-    let startTime = Date.now();
+    startTime = Date.now();
+    console.log(`Game started at: ${startTime}`);
     let timerInterval;
-    // 追加: secretNumberをHTMLに表示
-    document.getElementById('secretNumberDisplay').textContent = `Debug: Secret Number is ${secretNumber.join('')}`;
-    document.getElementById('debugArea').style.display = 'block';
 
     // ゲームエリアを表示し、ヒントや入力エリア、結果表示を初期化
     document.getElementById('gameArea').style.display = 'block';
@@ -134,12 +133,15 @@ function displayHints(remainingTime, secretNumber) {
     }
 }
 
+
 function checkGuess(digits, secretNumber, timerInterval) {
     const userGuess = [];
     // ユーザーの入力を取得
     for (let i = 0; i < digits; i++) {
         userGuess.push(parseInt(document.getElementById(`input${i}`).value));
     }
+
+    console.log(`User guess: ${userGuess}`);
 
     let hitCount = 0;
     let blowCount = 0;
@@ -153,10 +155,16 @@ function checkGuess(digits, secretNumber, timerInterval) {
         }
     }
 
+    console.log(`Hit count: ${hitCount}, Blow count: ${blowCount}`);
+
     // 結果を表示
     if (hitCount === digits) {
         clearInterval(timerInterval);
-        document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！`;
+        const endTime = Date.now(); // ゲームクリア時にタイマーを停止
+        const clearTime = (endTime - startTime) / 1000; // クリアタイムを計算
+        console.log(`Game ended at: ${endTime}`);
+        console.log(`Clear time: ${clearTime.toFixed(2)} seconds`);
+        document.getElementById('result').textContent = `すべての数字が合致しました！ゲームクリア！クリアタイム: ${clearTime.toFixed(2)} 秒`; // クリアタイムを表示
         document.getElementById('submitButton').style.display = 'none'; // submitButtonを非表示にする
         document.getElementById('retryButton').style.display = 'block';
     } else if (hitCount >= 1) {
