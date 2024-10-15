@@ -23,6 +23,11 @@ function startGame() {
     const secretNumber = generateSecretNumber(digits);
     let startTime = Date.now();
     let timerInterval;
+       // 追加: secretNumberをHTMLに表示
+    document.getElementById('secretNumberDisplay').textContent = `Debug: Secret Number is ${secretNumber.join('')}`;
+    document.getElementById('debugArea').style.display = 'block';
+
+
 
     // ゲームエリアを表示し、ヒントや入力エリア、結果表示を初期化
     document.getElementById('gameArea').style.display = 'block';
