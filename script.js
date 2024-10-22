@@ -2,8 +2,14 @@
 document.getElementById('startButton').addEventListener('click', startGame);
 
 let startTime;
+let hintTypes = []; // 各桁ごとのヒントの種類を保持する配列
+let sumHintDisplayed = false; // 合計ヒントが表示されたかどうかを保持するフラグ
+let hintDisplayed = []; // 各桁ごとのヒントが表示されたかどうかを保持する配列
+/**
+ * ゲームを開始する関数
+ * ユーザーが入力した桁数と制限時間を取得し、ゲームを初期化する
+ */
 function startGame() {
-   
     // ユーザーが入力した桁数と制限時間を取得
     const digits = parseInt(document.getElementById('digits').value);
     const timeLimit = parseInt(document.getElementById('timeLimit').value);
@@ -17,14 +23,18 @@ function startGame() {
         alert('制限時間は1秒以上で入力してください。');
         return;
     }
-     // 開始ボタンを非表示にする
-     document.getElementById('startButton').style.display = 'none';
 
+   
+    // 開始ボタンを非表示にする
+    document.getElementById('startButton').style.display = 'none';
 
     // 秘密の数字を生成
     const secretNumber = generateSecretNumber(digits);
-    startTime = Date.now();
-    console.log(`Game started at: ${startTime}`);
+    startTime = Date.now(); // ゲームの開始時間を記録
+
+    // デバッグ用に秘密の数字をコンソールに表示
+    console.log(`Secret Number: ${secretNumber.join('')}`);
+
     let timerInterval;
 
     // ゲームエリアを表示し、ヒントや入力エリア、結果表示を初期化
@@ -41,10 +51,24 @@ function startGame() {
         updateTimer(timeLimit, startTime, timerInterval, secretNumber);
     }, 1000);
 
+   
+ 
+
     // 送信ボタンがクリックされたときにcheckGuess関数を呼び出すイベントリスナーを追加
     document.getElementById('submitButton').addEventListener('click', () => {
         checkGuess(digits, secretNumber, timerInterval);
     });
+
+    // ヒントの種類を初期化
+    hintTypes = new Array(digits).fill(null);
+    hintDisplayed = new Array(digits).fill(false);
+    sumHintDisplayed = false; // 合計ヒント表示フラグを初期化
+    
+    // 合計ヒントを表示
+    const sumHint = displaySumHint(secretNumber);
+    document.getElementById('hints').innerHTML += `${sumHint}<br>`;
+    sumHintDisplayed = true; // 合計ヒント表示フラグを更新
+ 
 
     // スペースキーが押されたときにsubmitButtonをクリックするイベントリスナーを追加
     document.addEventListener('keydown', function(event) {
@@ -55,8 +79,11 @@ function startGame() {
     });
 }
 
+/**
+ * 指定された桁数分の入力フィールドを生成する関数
+ * @param {number} digits - 入力フィールドの数
+ */
 function createInputFields(digits) {
-    // 指定された桁数分の入力フィールドを生成
     for (let i = 0; i < digits; i++) {
         const input = document.createElement('input');
         input.type = 'number';
@@ -74,8 +101,7 @@ function createInputFields(digits) {
                     input.value = (parseInt(input.value) - 1 + 10) % 10;
                 }
                 event.preventDefault(); // デフォルトの動作を防ぐ
-            }
-            else if (event.key === 'ArrowUp') {
+            } else if (event.key === 'ArrowUp') {
                 if (input.value === '9') {
                     input.value = '0';
                 } else {
@@ -83,13 +109,12 @@ function createInputFields(digits) {
                 }
                 event.preventDefault(); // デフォルトの動作を防ぐ
             }
-            
         });
-
 
         document.getElementById('inputArea').appendChild(input);
     }
 }
+// もう一度プレイするボタンがクリックされたときの処理
 document.getElementById('retryButton').addEventListener('click', () => {
     // ゲームエリアを非表示にして初期状態に戻す
     document.getElementById('gameArea').style.display = 'none';
@@ -106,42 +131,102 @@ document.getElementById('retryButton').addEventListener('click', () => {
     document.getElementById('submitButton').addEventListener('click', checkGuessHandler); // 新しいイベントリスナーを追加
 });
 
+/**
+ * タイマーを更新し、制限時間を超えた場合の処理を行う関数
+ * @param {number} timeLimit - 制限時間
+ * @param {number} startTime - ゲームの開始時間
+ * @param {number} timerInterval - タイマーのインターバルID
+ * @param {Array} secretNumber - 秘密の数字の配列
+ */
 function updateTimer(timeLimit, startTime, timerInterval, secretNumber) {
-    // 経過時間と残り時間を計算
     const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
     const remainingTime = timeLimit - elapsedTime;
-    document.getElementById('timer').textContent = `Time limit: ${remainingTime}seconds`;
+    document.getElementById('timer').textContent = `Time limit: ${remainingTime} seconds`;
 
-    // 制限時間を超えた場合の処理
     if (remainingTime <= 0) {
         clearInterval(timerInterval);
         document.getElementById('result').textContent = "Time's up! Game over!";
         document.getElementById('submitButton').disabled = true;
-        document.getElementById('submitButton').style.display = 'none'; // submitButtonを非表示にする
-        document.getElementById('retryButton').style.display = 'block'; // もう一度プレイするボタンを表示
+        document.getElementById('submitButton').style.display = 'none';
+        document.getElementById('retryButton').style.display = 'block';
     }
 
-    // ヒントを表示
     displayHints(remainingTime, secretNumber);
 }
+/**
+ * 指定された桁の数字が特定の範囲内にあることを示すヒントを生成する関数
+ * @param {Array} secretNumber - 秘密の数字の配列
+ * @param {number} index - ヒントを生成する桁のインデックス
+ * @returns {string} - 数字が特定の範囲内にあることを示すヒントの文字列
+ */
+function displayRangeHint(secretNumber, index) {
+    const rangeStart = Math.max(0, secretNumber[index] - 2);
+    const rangeEnd = Math.min(9, secretNumber[index] + 2);
+    return `ヒント${index + 1}: この桁の数字は${rangeStart}から${rangeEnd}の間です`;
+}
 
+/**
+ * 指定された桁の数字が偶数か奇数かを示すヒントを生成する関数
+ * @param {Array} secretNumber - 秘密の数字の配列
+ * @param {number} index - ヒントを生成する桁のインデックス
+ * @returns {string} - 偶数か奇数かを示すヒントの文字列
+ */
+function displayEvenOddHint(secretNumber, index) {
+    const isEven = secretNumber[index] % 2 === 0;
+    return `ヒント${index + 1}: この桁の数字は${isEven ? '偶数' : '奇数'}です`;
+}
+
+/**
+ * 秘密の数字全体の合計を示すヒントを生成する関数
+ * @param {Array} secretNumber - 秘密の数字の配列
+ * @returns {string} - 数字の合計を示すヒントの文字列
+ */
+function displaySumHint(secretNumber) {
+    const sum = secretNumber.reduce((acc, num) => acc + num, 0);
+    return `全ての桁の数字の合計は${sum}です`;
+}
+
+/**
+ * 残り時間に応じてヒントを表示する関数
+ * @param {number} remainingTime - 残り時間
+ * @param {Array} secretNumber - 秘密の数字の配列
+ */
 function displayHints(remainingTime, secretNumber) {
     const hints = document.getElementById('hints');
-    hints.innerHTML = '';
+    
     const digits = secretNumber.length;
     const timeLimit = parseInt(document.getElementById('timeLimit').value);
-    const hintInterval = Math.floor(timeLimit / digits); // ヒントを出す間隔を計算し、切り捨て
+    const hintInterval = Math.floor(timeLimit / digits);
 
-    // 残り時間に応じてヒントを表示
     for (let i = 0; i < digits; i++) {
         const hintTime = timeLimit - hintInterval * (i + 1);
-        if (remainingTime <= hintTime) {
-            hints.innerHTML += `Tip.${i + 1}: ${secretNumber[i]} (No.${i + 1} of digits)<br>`;
+        if (remainingTime <= hintTime && !hintDisplayed[i]) {
+            if (hintTypes[i] === null) {
+                // ヒントの種類をランダムに選択し、配列に保存
+                hintTypes[i] = Math.floor(Math.random() * 2); // 合計ヒントは一度だけ表示するので、ランダム選択の範囲を2に変更
+            }
+            let hint;
+            switch(hintTypes[i]) {
+                case 0:
+                    hint = displayRangeHint(secretNumber, i);
+                    break;
+                case 1:
+                    hint = displayEvenOddHint(secretNumber, i);
+                    break;
+            }
+            hints.innerHTML += `${hint}<br>`;
+            hintDisplayed[i] = true; // ヒントが表示されたことを記録
         }
     }
 }
 
 
+/**
+ * ユーザーの入力をチェックし、結果を表示する関数
+ * @param {number} digits - 入力フィールドの数
+ * @param {Array} secretNumber - 秘密の数字の配列
+ * @param {number} timerInterval - タイマーのインターバルID
+ */
 function checkGuess(digits, secretNumber, timerInterval) {
     const userGuess = [];
     // ユーザーの入力を取得
@@ -184,14 +269,17 @@ function checkGuess(digits, secretNumber, timerInterval) {
     }
 }
 
+/**
+ * 指定された桁数分のランダムな秘密の数字を生成する関数
+ * @param {number} digits - 秘密の数字の桁数
+ * @returns {Array} - 生成された秘密の数字の配列
+ */
 function generateSecretNumber(digits) {
     const numbers = [];
     // 指定された桁数分のランダムな数字を生成
     while (numbers.length < digits) {
         const rand = Math.floor(Math.random() * 10);
-        if (!numbers.includes(rand)) {
-            numbers.push(rand);
-        }
+        numbers.push(rand);
     }
     return numbers;
 }
@@ -199,13 +287,17 @@ const bgm = document.getElementById('bgm');
 const playButton = document.getElementById('play');
 const pauseButton = document.getElementById('pause');
 
+// BGMの再生ボタンがクリックされたときの処理
 playButton.addEventListener('click', () => {
     bgm.play();
 });
 
+// BGMの一時停止ボタンがクリックされたときの処理
 pauseButton.addEventListener('click', () => {
     bgm.pause();
 });
+
+// 音量コントロールの変更時の処理
 document.getElementById('volumeControl').addEventListener('input', function (event) {
     var audio = document.getElementById('bgm');
     audio.volume = event.target.value / 100;
