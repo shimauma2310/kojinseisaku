@@ -70,9 +70,9 @@ function startGame() {
     sumHintDisplayed = true; // 合計ヒント表示フラグを更新
  
 
-    // スペースキーが押されたときにsubmitButtonをクリックするイベントリスナーを追加
+    // エンターキーが押されたときにsubmitButtonをクリックするイベントリスナーを追加
     document.addEventListener('keydown', function(event) {
-        if (event.code === 'Space') {
+        if (event.code === 'Enter') {
             event.preventDefault(); // デフォルトのスペースキーの動作を防ぐ
             document.getElementById('submitButton').click(); // submitButtonをクリック
         }
