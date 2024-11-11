@@ -19,11 +19,10 @@ function startGame() {
         alert('桁数は1から10の間で入力してください。');
         return;
     }
-    if (isNaN(timeLimit) || timeLimit <= 0) {
-        alert('制限時間は1秒以上で入力してください。');
+     if (isNaN(timeLimit) || timeLimit <= 0 || timeLimit >300) {
+        alert('制限時間は1秒以上且つ300秒以下で入力してください。');
         return;
     }
-
    
     // 開始ボタンを非表示にする
     document.getElementById('startButton').style.display = 'none';
