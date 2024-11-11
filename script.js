@@ -15,11 +15,11 @@ function startGame() {
     const timeLimit = parseInt(document.getElementById('timeLimit').value);
 
     // エラーチェック
-    if (isNaN(digits) || digits <= 0 || digits > 10) {
+    if (isNaN(digits) || digits < 0 || digits => 10) {
         alert('桁数は1から10の間で入力してください。');
         return;
     }
-    if (isNaN(timeLimit) || timeLimit <= 0) {
+    if (isNaN(timeLimit) || timeLimit < 0 || timeLimit => 300) {
         alert('制限時間は1秒以上で入力してください。');
         return;
     }
